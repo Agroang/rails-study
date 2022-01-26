@@ -81,4 +81,57 @@ describe 'Expectation Matchers' do
       expect(5..10).to cover(9)
     end
   end
+
+  describe 'collection matchers' do
+
+    it 'will match arrays'do
+      array = [1, 2, 3]
+
+      expect(array).to include(3)
+      expect(array).to include(1, 3)
+
+      expect(array).to start_with(1)
+      expect(array).to end_with(3)
+
+      expect(array).to match_array([3, 2, 1])
+      expect(array).not_to match_array([1, 2])
+
+      expect(array).to contain_exactly(3, 2, 1) # similar to match_array
+      expect(array).not_to contain_exactly(1, 2) # but uses individual args
+    end
+
+    it 'will match strings' do
+      string = 'some string'
+
+      expect(string).to include('ring')
+      expect(string).to include('so', 'ring')
+      expect(string).to include('s', 'm')
+      expect(string).not_to include('z')
+
+      expect(string).to start_with('so')
+      expect(string).to start_with('s')
+      expect(string).to end_with('ring')
+      expect(string).to end_with('g')
+    end
+
+    it 'will match hashes' do
+      hash = {:a => 1, :b => 2, :c => 3}
+      new_hash = {a: 1, b: 2, c: 3}
+
+      expect(hash).to include(:a)
+      expect(hash).to include(:a => 1)
+      expect(new_hash).to include(:a) # this one doesn't work like bellow
+      expect(new_hash).to include(a: 1) # works with new syntax
+
+      expect(hash).to include(:a => 1, :c => 3)
+      expect(hash).to include({:a => 1, :c => 3})
+      expect(new_hash).to include(a: 1, c: 3) # more than 1 also works with new
+      expect(new_hash).to include({a: 1, c: 3}) # syntax
+
+      expect(hash).not_to include({'a' => 1, 'c' => 3}) # in RoR the 'a' would
+      # work for the symbol a:, but in pure ruby it won't
+      expect(new_hash).not_to include ({'a'=> 1, 'c'=> 3}) # doesn't work as
+      # 'a' : 1
+    end
+  end
 end
