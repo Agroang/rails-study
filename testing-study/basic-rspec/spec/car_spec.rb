@@ -25,6 +25,8 @@ describe 'Car' do
       car = Car.new
       expect(car.wheels).to eq(4)
     end
+
+    it 'allows writing for :doors' # without the do/end it will become 'pending'
   end
 
   describe '.colors' do
