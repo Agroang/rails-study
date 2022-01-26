@@ -134,4 +134,66 @@ describe 'Expectation Matchers' do
       # 'a' : 1
     end
   end
+
+  describe 'other useful matchers' do
+
+    it 'will match strings with a regex' do
+      # this is a good way to 'spot check' strings
+      string = 'The order has been received'
+      expect(string).to match(/order(.+)received/)
+
+
+      expect('123').to match(/\d{3}/)
+      expect(123).not_to match(/\d{3}/) # only works with strings
+      expect((123.to_s)).to match(/\d{3}/) # integer to string to use
+
+      email = 'someone@somewhere.com'
+      expect(email).to match(/\A\w+@\w+\.\w{3}\Z/)
+    end
+
+    it 'will match object types' do
+      expect('test').to be_instance_of(String)
+      expect('test').to be_an_instance_of(String) # same as above
+
+      expect('test').to be_kind_of(String)
+      expect('test').to be_a_kind_of(String) # same as above
+      expect('test').to be_a(String) # same as above
+
+      expect([1, 2, 3,]).to be_an(Array) # same as above, but reads nicer for
+      # array
+    end
+
+    it 'will match objects with #respond_to' do
+      string = 'test'
+
+      expect(string).to respond_to(:length) # method needs to be passed as a
+      # symbol
+      expect(string).to respond_to(:size)
+      expect(string).not_to respond_to(:sort) # array method!
+    end
+
+    it 'will match class instances with #have_attributes' do
+      class Car
+        attr_accessor :make, :year, :color
+      end
+      car = Car.new
+      car.make = 'Honda'
+      car.year = 2007
+      car.color = 'black'
+
+      expect(car).to have_attributes(:color => 'black')
+      expect(car).to have_attributes(
+        :make => 'Honda',
+        :year => 2007,
+        :color => 'black'
+      )
+    end
+
+    it 'will match anything with #satisfy' do
+      # this is the most flexible matcher
+      expect(10).to satisfy do |value|
+        (value >= 5) && (value <= 10) && (value % 2 == 0)
+      end
+    end
+  end
 end
