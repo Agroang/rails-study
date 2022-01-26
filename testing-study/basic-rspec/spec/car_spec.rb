@@ -12,7 +12,7 @@ describe 'Car' do
     it 'allows reading and writing for :year' do
       car = Car.new
       car.year = 9999
-      expect(car.year)to. eq(9999)
+      expect(car.year).to eq(9999)
     end
 
     it 'allows reading and writing for :color' do
@@ -37,7 +37,7 @@ describe 'Car' do
 
   describe '#full_name' do
 
-    if 'returns a string in the expected format' do
+    it 'returns a string in the expected format' do
       @honda = Car.new(make: 'Honda', year: 2004, color: 'blue')
       expect(@honda.full_name).to eq ('2004 Honda (blue)')
     end
