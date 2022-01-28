@@ -17,32 +17,40 @@ describe 'Car' do
     # "let" is better than "before" for setting up instance variables, so I
     # commented out the above.
 
-    let(:car) { Car.new }
+    # let(:car) { Car.new }
     # because we commented out the "before" method we are no longer using
     # those instace variables so I changed the bellow code accordingly,
     # otherwise it would still be something like @car.make = 'Test'
 
+    # use "subject" instead of "let" if variable is subject of example
+    # we will replace  let(:car) { Car.new } with subject { Car.new }
+    # there is no correct, but subject will stand out and will make a difference
+    # from other "let" variables that you may be using, both are correct
+
+    subject { Car.new }
+
     it 'allows reading and writing for :make' do
       # car = Car.new
-      car.make = 'Test' # writing here
-      expect(car.make).to eq('Test') # reading here
+      # changing "car" to "subject" as we are replace "let" with "subject"
+      subject.make = 'Test' # writing here
+      expect(subject.make).to eq('Test') # reading here
     end
 
     it 'allows reading and writing for :year' do
       # car = Car.new
-      car.year = 9999
-      expect(car.year).to eq(9999)
+      subject.year = 9999
+      expect(subject.year).to eq(9999)
     end
 
     it 'allows reading and writing for :color' do
       # car = Car.new
-      car.color = 'foo'
-      expect(car.color).to eq('foo')
+      subject.color = 'foo'
+      expect(subject.color).to eq('foo')
     end
 
     it 'allows reading for :wheels' do # only attribute reader set on the class
       # car = Car.new
-      expect(car.wheels).to eq(4)
+      expect(subject.wheels).to eq(4)
     end
 
     it 'allows writing for :doors' # without the do/end it will become 'pending'
