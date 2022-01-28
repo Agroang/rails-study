@@ -1,6 +1,9 @@
 require 'car'
 
-describe 'Car' do
+# changing 'Car' to Car to use the actual classname and not string, that way
+# we get a implict subject and there is no need to define the subject
+# describe 'Car' do
+describe Car do
 
   describe 'attributes' do
 
@@ -27,7 +30,9 @@ describe 'Car' do
     # there is no correct, but subject will stand out and will make a difference
     # from other "let" variables that you may be using, both are correct
 
-    subject { Car.new }
+    # we don't need subject explicitly-defined if we use a classname after
+    # describe, so we can comment out bellow
+    # subject { Car.new }
 
     it 'allows reading and writing for :make' do
       # car = Car.new
