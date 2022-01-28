@@ -101,3 +101,41 @@ RSpec.configure do |config|
   Kernel.srand config.seed
 =end
 end
+
+# added this bellow as per tutorial, first puts the absolute path to our
+# project when we run the suite, that can be useful
+# the other two methods are mainly use when you have a command ruby program,
+# one to avoid the outputs and the second the stash the outputs and put it
+# later for use if needed
+
+APP_ROOT = File.expand_path('../..', __FILE__)
+# writing '..' instead of '../..' puts up to /spec, current up to project
+# folder
+puts APP_ROOT
+
+# no_output do
+#  ...code here
+# end
+
+def no_output(&block)
+  original_stdout = $stdout.dup
+  $stdout.reopen('/dev/null')
+  $stdout.sync = true
+  begin
+    yield
+  ensure
+    $stdout.reopen(original_stdout)
+  end
+end
+
+def capture_output(&block)
+  original_stdout = $stdout.dup
+  output_catcher = StringIO.new
+  $stdout = output_catcher
+  begin
+    yield
+  ensure
+    $stdout = original_stdout
+  end
+  output_catcher.string
+end
