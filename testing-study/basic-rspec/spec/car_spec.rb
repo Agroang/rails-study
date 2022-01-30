@@ -74,6 +74,11 @@ describe Car do
     it 'defaults to 4 doors' do
       expect(subject.doors).to eq(4)
     end
+
+    it 'allows setting a new number of doors' do
+      car = Car.new(:doors => 1)
+      expect(car.doors).to eq(1)
+    end
   end
 
   describe '.colors' do
