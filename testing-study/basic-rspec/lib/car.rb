@@ -25,4 +25,8 @@ class Car
   def coupe?
     doors == 2 # returns true if 2 or false otherwise
   end
+
+  def sedan?
+    doors == 4
+  end
 end

@@ -130,4 +130,16 @@ describe Car do
       expect(car.coupe?).to be false
     end
   end
+
+  describe '#sedan?' do
+    it 'returns true if it has 4 doors' do
+      car = Car.new(:doors => 4)
+      expect(car.sedan?).to be true
+    end
+
+    it 'returns false if it does not have 4 doors' do
+      car = Car.new(:doors => 2)
+      expect(car.sedan?).to be false
+    end
+  end
 end
