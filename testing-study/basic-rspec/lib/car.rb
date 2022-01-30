@@ -21,4 +21,8 @@ class Car
   def full_name
     "#{self.year.to_s} #{self.make} (#{self.color})"
   end
+
+  def coupe?
+    doors == 2 # returns true if 2 or false otherwise
+  end
 end
