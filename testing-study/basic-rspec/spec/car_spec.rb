@@ -76,8 +76,17 @@ describe Car do
     end
 
     it 'allows setting a new number of doors' do
-      car = Car.new(:doors => 1)
-      expect(car.doors).to eq(1)
+      car = Car.new(:doors => 2)
+      expect(car.doors).to eq(2)
+    end
+
+    it 'defaults to 4 if option is neither 2 or 4' do
+      door_count = []
+      [0, 1, 3, 5, 6].each do |n| # just targeting some numbers, but not 2 or 4
+        car = Car.new(:door => n)
+        door_count << car.doors
+      end
+      expect(door_count).to all(eq(4)) # each value to eq 4
     end
   end
 

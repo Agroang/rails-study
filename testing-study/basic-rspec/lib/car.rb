@@ -10,6 +10,8 @@ class Car
     @wheels = 4
     # @doors = 4
     self.doors = (options[:doors] || 4).to_i
+    self.doors = 4 unless [2, 4].include?(doors) # very cool code, defaults to
+    # 4 unless doors includes 2 or 4
   end
 
   def self.colors
