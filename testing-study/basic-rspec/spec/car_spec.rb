@@ -65,6 +65,11 @@ describe Car do
   #   it 'allows writing for :doors' # without the do/end it will become 'pending'
   # end
 
+  it 'allows reading and writing for :doors' do
+    subject.doors = 1
+    expect(subject.doors).to eq(1)
+  end
+
   describe '.colors' do
     # c = ['blue', 'black', 'red', 'green'] changing this to use "let"
     let(:colors) { ['blue', 'black', 'red', 'green'] }
