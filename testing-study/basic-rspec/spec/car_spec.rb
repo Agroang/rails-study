@@ -70,6 +70,12 @@ describe Car do
     expect(subject.doors).to eq(1)
   end
 
+  describe '#initialize' do
+    it 'defaults to 4 doors' do
+      expect(subject.doors).to eq(4)
+    end
+  end
+
   describe '.colors' do
     # c = ['blue', 'black', 'red', 'green'] changing this to use "let"
     let(:colors) { ['blue', 'black', 'red', 'green'] }
