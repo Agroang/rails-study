@@ -130,7 +130,7 @@ describe 'Expectation Matchers' do
 
       expect(hash).not_to include({'a' => 1, 'c' => 3}) # in RoR the 'a' would
       # work for the symbol a:, but in pure ruby it won't
-      expect(new_hash).not_to include ({'a'=> 1, 'c'=> 3}) # doesn't work as
+      expect(new_hash).not_to include({'a'=> 1, 'c'=> 3}) # doesn't work as
       # 'a' : 1
     end
   end
