@@ -1,3 +1,13 @@
+class School
+  attr_reader :name, :students
+
+  def initialize(name)
+    @name = name
+    @students = []
+  end
+
+end
+
 RSpec.describe School do
   it 'has a name' do
     school = School.new('Beverly Hills High School')
