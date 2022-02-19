@@ -31,13 +31,15 @@ RSpec.describe Card do # no need to use RSpec.describe, describe suffice
     # expect(card.rank).to eq('Ace') # calling card method
     # card.rank = 'Queen' won't work, you are just calling the method again
     expect(card.rank).to eq('Ace')
-    card.rank = 'Queen'
+    card.rank = 'Queen' # same card, kept due to memoization throughout this
+    # example, the next example will be a different card
     expect(card.rank).to eq('Queen')
   end
 
   it 'has a suit' do
     # card = Card.new('Ace', 'Spade')
     # expect(@card.suit).to eq('Spade')
-    expect(card.suit).to eq('Spade')
+    expect(card.suit).to eq('Spade')#, "I can pass a #{custom} error message here"
+    # more info about custom error messages on lesson and a little bit on my .txt
   end
 end
