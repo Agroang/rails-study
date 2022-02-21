@@ -20,4 +20,20 @@ RSpec.describe 'equality matchers' do
       expect(b).to eql(3)
     end
   end
+
+  describe 'equal and be matcher' do #equal and be are alias, same method
+    let(:c) { [1, 2, 3] }
+    let(:d) { [1, 2, 3] }
+    let(:e) { c }
+
+    it 'cares about object identity' do
+      expect(c).to eq(d)
+      expect(c).to eql(d)
+
+      expect(c).to equal(e) # point toward the same object
+      expect(c).to be(e) # alias of equal, both work
+      expect(:hello).to equal(:hello) # symbols are unique, use the same memory
+      expect(c).not_to equal(d) # different objects in memory
+    end
+  end
 end
