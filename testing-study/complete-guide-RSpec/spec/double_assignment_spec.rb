@@ -7,6 +7,7 @@ RSpec.describe 'doubles' do
     fs = double("File System")
     allow(fs).to receive(:read).and_return("Romeo and Juliet")
     allow(fs).to receive(:write).and_return(false)
+    # testing just in case, not part of assignment
     expect(fs.read).to eq("Romeo and Juliet")
     expect(fs.write).to eq(false)
   end
