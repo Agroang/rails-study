@@ -41,3 +41,6 @@ end
 "abc".reverse # => "override"
 # You want to avoid this kind of things! Be sure that you are writing a new
 # method and not overwriting one if you want to use Open Class
+
+# Question: What about self.method_name for class methods? Wasn't that the way
+# to define class methods?
