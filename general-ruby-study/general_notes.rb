@@ -76,3 +76,27 @@
 # pick a class when you mean it to be instantiated or inherited.
 
 # Just as classes are nothing but objects, class names are nothing but constants.
+
+# Constants: Any reference that begins with an uppercase letter, including the
+# names of classes and modules, is a constant.
+
+# One big difference between a variable and a constant is their scope. Constant
+# have their own special set of rules when it comes to scope.
+# Constants’ paths use a double colon as a sepaparator (::)
+
+# "Namespace" is a module that act as a container of constants
+
+# "include" and "prepend" are similar but "prepend" goes first when you are
+# calling the ancestors's list of an specific constant. (Detailed info in the
+# the_object_model file)
+
+# The Kernel module, included in the Object class includes methods that you can
+# call everyone in your code, such as print. So print is not actually a language
+# keyword but a method!
+
+# self refers to the current object receiver of a method, so self is always
+# changing and the top level is "main"
+
+# Private methods: Private methods are governed by a single simple rule: you
+# cannot call a private method with an explicit receiver. In other words, every
+# time you call a private method, it must be on the implicit receiver—self.
