@@ -56,16 +56,23 @@
 # spring into existence when you assign them a value, so you can have objects
 # of the same class that carry different instance variables.
 
-class MyClass
-  def my_method
-  @v = 1
-  end
-end
-obj = MyClass.new
-obj.class # => MyClass
+# Instance variables live in objects; methods live in classes!
+# Let’s wrap it all up: an object’s instance variables live in the object itself,
+# and an object’s methods live in the object’s class. That’s why objects of the
+# same class share methods but don’t share instance variables.
 
-obj.my_method
-obj.instance_variables # => [:@v]
+# Here is possibly the most important thing you’ll ever learn about the Ruby
+# object model: classes themselves are nothing but objects.
 
-# If you don't use #my_method you wouldn't have that @v from the call to
-# #instance_variables
+# You can create classes with Class.new on runtime, essential to Ruby's
+# metaprogramming and something very powerful!
+
+# The "false" argument here means: ignore inherited methods
+# Class.instance_methods(false) # => [:allocate, :new, :superclass]
+# A Ruby class inherits from its superclass.
+
+# The main reason for having a distinction between modules and classes is clarity.
+# Usually, you pick a module when you mean it to be included somewhere, and you
+# pick a class when you mean it to be instantiated or inherited.
+
+# Just as classes are nothing but objects, class names are nothing but constants.
