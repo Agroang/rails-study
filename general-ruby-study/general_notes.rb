@@ -100,3 +100,9 @@
 # Private methods: Private methods are governed by a single simple rule: you
 # cannot call a private method with an explicit receiver. In other words, every
 # time you call a private method, it must be on the implicit receiver—self.
+
+# Refinements are similar to Monkeypatches, but they’re not global. A
+# Refinement is active in only two places: the refine block itself and the code
+# starting from the place where you call using until the end of the module (if
+# you’re in a module definition) or the end of the file (if you’re at the top
+# level)

@@ -523,3 +523,83 @@ C.new.public_method # NoMethodError: private method ‘private_method’ called 
 # part helps to understand better **
 
 # Class Definitions and self:
+
+# In a class or module definition (and outside of any method), the role of self is
+# taken by the class or module itself.
+
+class MyClass
+  self # => MyClass
+end
+
+# So, summing up what we have been talking about lately:
+# When you call a method, Ruby looks up the method by following the “one step to
+# the right, then up” rule and then executes the method with the receiver as self.
+# There are some special cases in this procedure (for example, when you include a
+# module), but there are no exceptions…except for one.
+
+# Refinements:
+
+# To avoid the fears and problems that monkeypatching can produce, Starting from
+# Ruby 2.0 there is a new way to change classes by using the word "refine".
+# Begin by writing a module and calling refine inside the module definition:
+
+module StringExtensions
+  refine String do
+    def to_alphanumeric
+      gsub(/[^\w\s]/, '')
+    end
+  end
+end
+
+# This code refines the String class with a new to_alphanumeric method. Differently
+# from a regular Open Class, however, a Refinement is not active by default. If
+# you try to call String#to_alphanumeric, you’ll get an error:
+
+"my *1st* refinement!".to_alphanumeric
+# NoMethodError: undefined method `to_alphanumeric' [...]
+
+# To activate the changes, you have to do so explicitly, with the using method:
+
+using StringExtensions
+
+# From the moment you call using, all the code in that Ruby source file will see
+# the changes:
+
+"my *1st* refinement!".to_alphanumeric # => "my 1st refinement"
+
+# Starting from Ruby 2.1, you can even call using inside a module definition.
+# The Refinement will be active until the end of the module definition.
+
+module StringExtensions
+  refine String do
+    def reverse
+      "esrever"
+    end
+  end
+end
+
+module StringStuff
+  using StringExtensions
+  "my_string".reverse # => "esrever"
+end
+
+"my_string".reverse # => "gnirts_ym"
+
+# Refinements are similar to Monkeypatches, but they’re not global. A
+# Refinement is active in only two places: the refine block itself and the code
+# starting from the place where you call using until the end of the module (if
+# you’re in a module definition) or the end of the file (if you’re at the top
+# level)
+
+# In the limited scope where it’s active, a Refinement is just as good as an Open
+# Class or a Monkeypatch. It can define new methods, redefine existing methods,
+# include or prepend modules, and generally do anything that a regular Open Class
+# can do. Code in an active Refinement takes precedence over code in the refined
+# class, and also over code in modules that are included or prepended by the
+# class. Refining a class is like slapping a patch right onto the original code of
+# the class.
+
+# Because refinements are not global, you don't have the problems that monkeypatchs
+# can cause. Of course, it also has its own downsides.
+
+# Refinement Gotchas:
