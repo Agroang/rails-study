@@ -106,3 +106,7 @@
 # starting from the place where you call using until the end of the module (if
 # you’re in a module definition) or the end of the file (if you’re at the top
 # level)
+
+# Careful in the order that you include your modules, depending on that the
+# chain of ancestors will change and you might be calling different methods
+# if they share a common label!

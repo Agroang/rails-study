@@ -603,3 +603,90 @@ end
 # can cause. Of course, it also has its own downsides.
 
 # Refinement Gotchas:
+
+class MyClass
+  def my_method
+    "original my_method()"
+  end
+
+  def another_method
+    my_method
+  end
+end
+
+module MyClassRefinement
+  refine MyClass do
+    def my_method
+      "refined my_method()"
+    end
+  end
+end
+
+using MyClassRefinement
+
+MyClass.new.my_method # => "refined my_method()"
+MyClass.new.another_method # => "original my_method()
+
+# The call to my_method happens after the call to using, so you get the refined
+# version of the method, just like you expect. However, the call to another_method
+# could catch you off guard: even if you call another_method after using, the call
+# to my_method itself happens before using—so it calls the original, unrefined
+# version of the method.
+
+# ** This is a little bit hard to grasp, be careful with this and re read as
+# many times as needed **
+
+# The lesson here is to double-check your method calls when you use Refinements.
+# Also, metaprogramming methods such as methods and ancestors ignore Refinements
+# altogether!
+
+# Another example with refinements:
+
+module MyRefinement
+  refine String do
+    def reverse
+      "my reverse"
+    end
+  end
+end
+
+"abc".reverse # => "cba"
+using MyRefinement
+"abc".reverse # => "my reverse"
+
+# Careful in the order that you include your modules, depending on that the
+# chain of ancestors will change and you might be calling different methods
+# if they share a common label!
+
+# Wrap-up:
+
+# 1) An object is composed of a bunch of instance variables and a link to a
+#    class.
+# 2) The methods of an object live in the object’s class. (From the point of
+#    view of the class, they’re called instance methods.)
+# 3) The class itself is just an object of class Class. The name of the class is
+#    just a constant.
+# 4) Class is a subclass of Module. A module is basically a package of methods.
+#    In addition to that, a class can also be instantiated (with new) or arranged
+#    in a hierarchy (through its superclass).
+# 5) Constants are arranged in a tree similar to a file system, where the names
+#    of modules and classes play the part of directories and regular constants
+#    play the part of files.
+# 6) Each class has an ancestors chain, beginning with the class itself and
+#    going up to BasicObject.
+# 7) When you call a method, Ruby goes right into the class of the receiver
+#    and then up the ancestors chain, until it either finds the method or
+#    reaches the end of the chain.
+# 8) When you include a module in a class, the module is inserted in the
+#    ancestors chain right above the class itself. When you prepend the module,
+#    it is inserted in the ancestors chain right below the class.
+# 9) When you call a method, the receiver takes the role of self.
+# 10)When you’re defining a module (or a class), the module takes the role of
+#    self.
+# 11)Instance variables are always assumed to be instance variables of self.
+# 12)Any method called without an explicit receiver is assumed to be a method
+#    of self.
+# 13)Refinements are like pieces of code patched right over a class, and they
+#    override normal method lookup. On the other hand, a Refinement works
+#    in a limited area of the program: the lines of code between the call to
+#    using and the end of the file, or the end of the module definition.
