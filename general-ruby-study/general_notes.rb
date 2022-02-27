@@ -119,3 +119,12 @@
 
 # About Dynamic Methods: Using Module.define_methods you can define methods at
 # runtime and that is the biggest advantage over using the good ol' def keyword.
+
+# method_missing:
+# As Ruby doesn't use a compiler you can call methods that don't exist on objects.
+# If the object doesn't have that method it will call method_missing method, a
+# method inherited from BasicObject and it will show the error.
+# You can override it to intercept unknown messages.
+
+# You can use method_missing to make ghost methods, methods that don't exist
+# but by overwriting method_missing you can return something back.

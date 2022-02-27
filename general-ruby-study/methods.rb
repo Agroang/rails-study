@@ -241,3 +241,78 @@ end
 # that are not really methods and a very special method named method_missing.
 
 # method_missing:
+
+# With Ruby, there’s no compiler to enforce method calls. This means you can
+# call a method that doesn’t exist. For example:
+
+class Lawyer; end
+nick = Lawyer.new
+nick.talk_simple
+
+# NoMethodError: undefined method `talk_simple' for #<Lawyer:0x007f801aa81938>
+
+# When you call talk_simple, Ruby goes into nick’s class and browses its instance
+# methods. If it can’t find talk_simple there, it searches up the ancestors chain
+# into Object and eventually into BasicObject.
+
+# Because Ruby can’t find talk_simple anywhere, it admits defeat by calling a
+# method named method_missing on nick, the original receiver. Ruby knows that
+# method_missing is there, because it’s a private instance method of BasicObject
+# that every object inherits.
+
+# You can experiment by calling method_missing yourself. It’s a private method,
+# but you can get to it through send:
+
+nick.send :method_missing, :my_method
+
+# NoMethodError: undefined method `my_method' for #<Lawyer:0x007f801b0f4978>
+
+# You have just done exactly what Ruby does. You told the object, “I tried to
+# call a method named my_method on you, and you did not understand.”
+# BasicObject#method_missing responded by raising a NoMethodError. In fact, this
+# is what method_missing does for a living. It’s like an object’s dead-letter
+# office, the place where unknown messages eventually end up (and the place where
+# NoMethodErrors come from).
+
+# Overriding method_missing:
+
+# You can override it to intercept unknown messages. Each message landing on
+# method_missing’s desk includes the name of the method that was called, plus
+# any arguments and blocks associated with the call.
+
+class Lawyer
+  def method_missing(method, *args)
+    puts "You called: #{method}(#{args.join(', ')})"
+    puts "(You also passed it a block)" if block_given?
+  end
+end
+
+bob = Lawyer.new
+bob.talk_simple('a', 'b') do
+  # a block
+end
+
+# You called: talk_simple(a, b)
+# (You also passed it a block)
+
+# Ghost Methods:
+
+# When you need to define many similar methods, you can spare yourself the
+# definitions and just respond to calls through method_missing. This is like saying
+# to the object, “If they ask you something and you don’t understand, do this.”
+# From the caller’s side, a message that’s processed by method_missing looks like
+# a regular call—but on the receiver’s side, it has no corresponding method.
+# This trick is called a Ghost Method.
+
+# Examples:
+
+class C
+  def method_missing(name, *args)
+    name.to_s.reverse
+  end
+end
+
+obj = C.new
+obj.my_ghost_method # => "dohtem_tsohg_ym"
+
+# Dynamic Proxies:
