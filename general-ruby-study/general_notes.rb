@@ -110,3 +110,9 @@
 # Careful in the order that you include your modules, depending on that the
 # chain of ancestors will change and you might be calling different methods
 # if they share a common label!
+
+# Usually you call methods through the dot notation but there is another way
+# using the #send method. This is used for "Dynamic Methods". (More info on
+# the methods.rb file)
+# You can wait literally until the very last moment to decide which method to
+# call, while the code is running. This technique is called "Dynamic Dispatch".
