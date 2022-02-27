@@ -116,3 +116,6 @@
 # the methods.rb file)
 # You can wait literally until the very last moment to decide which method to
 # call, while the code is running. This technique is called "Dynamic Dispatch".
+
+# About Dynamic Methods: Using Module.define_methods you can define methods at
+# runtime and that is the biggest advantage over using the good ol' def keyword.

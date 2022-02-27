@@ -6,6 +6,19 @@
 # Dynamic Methods:
 
 # Code with  lot of duplications.... :
+
+class DS
+  def initialize # connect to data source...
+  def get_cpu_info(workstation_id) # ...
+  def get_cpu_price(workstation_id) # ...
+  def get_mouse_info(workstation_id) # ...
+  def get_mouse_price(workstation_id) # ...
+  def get_keyboard_info(workstation_id) # ...
+  def get_keyboard_price(workstation_id) # ...
+  def get_display_info(workstation_id) # ...
+  def get_display_price(workstation_id) # ...
+# ...and so on
+
 class Computer
   def initialize(computer_id, data_source)
     @id = computer_id
@@ -112,3 +125,119 @@ end
 
 obj = MyClass.new
 obj.my_method(2) # => 6
+
+# There is one important reason to use define_method over the more familiar def
+# keyword: define_method allows you to decide the name of the defined method
+# at runtime.
+
+# Refactoring the duplicated code:
+
+class Computer
+  def initialize(computer_id, data_source)
+    @id = computer_id
+    @data_source = data_source # using DS.new that holds all the data(info above)
+  end
+
+  def mouse
+    component :mouse # calling the component method with :mouse, "Dynamic Dispatch"
+  end
+
+  def cpu
+    component :cpu
+  end
+
+  def keyboard
+    component :keyboard
+  end
+
+  def component(name)
+    info = @data_source.send "get_#{name}_info", @id # using #send
+    price = @data_source.send "get_#{name}_price", @id
+    result = "#{name.capitalize}: #{info} ($#{price})"
+    return "* #{result}" if price >= 100
+    result
+  end
+end
+
+# A call to mouse is delegated to component, which in turn calls DS#get_mouse_info
+# and DS#get_mouse_price. The call also writes the capitalized name of the
+# component in the resulting string.
+# ** This is really cool, practical and useful! **
+
+my_computer = Computer.new(42, DS.new)
+my_computer.cpu # => * Cpu: 2.16 Ghz ($220)
+
+# This new version of Computer is a step forward because it contains far fewer
+# duplicated lines—but you still have to write dozens of similar methods. To
+# avoid writing all those methods, you can turn to define_method.
+
+# Generating methods dynamically:
+# (Going even further and using define_method to make it even shorter)
+
+class Computer
+  def initialize(computer_id, data_source)
+    @id = computer_id
+    @data_source = data_source
+  end
+
+  def self.define_component(name)
+    define_method(name) do
+      info = @data_source.send "get_#{name}_info", @id
+      price = @data_source.send "get_#{name}_price", @id
+      result = "#{name.capitalize}: #{info} ($#{price})"
+      return "* #{result}" if price >= 100
+      result
+    end
+  end
+
+  define_component :mouse # calling the above define_component method
+  define_component :cpu
+  define_component :keyboard
+end
+
+# Note that the three calls to define_component are executed inside the definition
+# of Computer, where Computer is the implicit self. Because you’re calling
+# define_component on Computer, you have to make it a class method.
+# ** Interesting! Understandable after reading it a few times **
+# Once again, really cool logic behind this.
+
+# The latest Computer contains minimal duplication, but you can push it even
+# further and remove the duplication altogether. How? By getting rid of all those
+# calls to define_component. You can do that by introspecting the data_source
+# argument and extracting the names of all components:
+
+class Computer
+  def initialize(computer_id, data_source)
+    @id = computer_id
+    @data_source = data_source
+    data_source.methods.grep(/^get_(.*)_info$/) { Computer.define_component $1 }
+  end
+
+  def self.define_component(name)
+    define_method(name) do
+      # ...
+    end
+  end
+end
+
+# The new line in initialize is where the magic happens.
+# First, if you pass a block to Array#grep, the block is evaluated for each
+# element that matches the regular expression. Second, the string matching the
+# parenthesized part of the regular expression is stored in the global variable
+# $1. So, if data_source has methods named get_cpu_info and get_mouse_info, this
+# code ultimately calls Computer.define_component twice, with the strings "cpu"
+# and "mouse". Note that define_method works equally well with a string or a symbol.
+
+# The duplicated code is finally gone for good. As a bonus, you don’t even have
+# to write or maintain the list of components. If someone adds a new component
+# to DS, the Computer class will support it automatically. Isn’t that wonderful?
+
+# As far as I understand, the above is just to create the methods (the grep)
+# stuff, you still use info and price on the actual method define_component,
+# but this makes the call to define_component with the name that you get from
+# the grep.
+
+# For the second possible solution, you need to know about some strange methods
+# that are not really methods and a very special method named method_missing.
+
+# method_missing:
