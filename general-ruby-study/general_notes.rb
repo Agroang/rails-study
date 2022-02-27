@@ -128,3 +128,6 @@
 
 # You can use method_missing to make ghost methods, methods that don't exist
 # but by overwriting method_missing you can return something back.
+# What about respond_to? Will ghost methods appear? :
+# The rule is this: remember to override respond_to_missing? (not respond_to)
+# every time you override method_missing.

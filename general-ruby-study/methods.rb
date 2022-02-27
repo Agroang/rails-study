@@ -316,3 +316,148 @@ obj = C.new
 obj.my_ghost_method # => "dohtem_tsohg_ym"
 
 # Dynamic Proxies:
+
+# Ghost Methods are usually icing on the cake, but some objects actually
+# rely almost exclusively on them. These objects are often wrappers for something
+# else—maybe another object, a web service, or code written in a different
+# language. They collect method calls through method_missing and forward them
+# to the wrapped object.
+
+# An object which catches Ghost Methods and forwards them to another object, is
+# called a Dynamic Proxy.
+
+# Example:
+
+class MyDynamicProxy
+  def initialize(target)
+    @target = target
+  end
+
+  def method_missing(name, *args, &block) # &block is it accept a ruby block
+    "result: #{@target.send(name, *args, &block)}"
+  end
+end
+
+obj = MyDynamicProxy.new("a string")
+obj.reverse # => "result: gnirts a"
+
+# Another example:
+
+class Foo
+  def method_missing(sym, *args, &block)
+     puts "#{sym} was called with #{args} and returned #{block.call(args)}"
+  end
+end
+
+bar = Foo.new
+bar.test(1,2,3) do |a|
+  a.map{|e| e + 2}
+end
+
+# => test was called with [1, 2, 3] and returned [3, 4, 5]
+
+# ** This is some quite interesting and mindblowing stuff right here **
+
+# Refactoring again, now with missing_method:
+
+# old unrefactored version:
+class Computer
+  def initialize(computer_id, data_source)
+    @id = computer_id
+    @data_source = data_source
+  end
+
+  def mouse
+    info = @data_source.get_mouse_info(@id)
+    price = @data_source.get_mouse_price(@id)
+    result = "Mouse: #{info} ($#{price})"
+    return "* #{result}" if price >= 100
+    result
+  end
+
+  def cpu
+    info = @data_source.get_cpu_info(@id)
+    price = @data_source.get_cpu_price(@id)
+    result = "Cpu: #{info} ($#{price})"
+    return "* #{result}" if price >= 100
+    result
+  end
+
+  def keyboard
+    info = @data_source.get_keyboard_info(@id)
+    price = @data_source.get_keyboard_price(@id)
+    result = "Keyboard: #{info} ($#{price})"
+    return "* #{result}" if price >= 100
+    result
+  end
+# ...
+end
+
+class Computer
+  def initialize(computer_id, data_source)
+    @id = computer_id
+    @data_source = data_source
+  end
+
+  def method_missing(name)
+    super if !@data_source.respond_to?("get_#{name}_info")
+    info = @data_source.send("get_#{name}_info", @id)
+    price = @data_source.send("get_#{name}_price", @id)
+    result = "#{name.capitalize}: #{info} ($#{price})"
+    return "* #{result}" if price >= 100
+    result
+  end
+end
+
+my_computer = Computer.new(42, DS.new)
+my_computer.cpu # => * Cpu: 2.9 Ghz quad-core ($120)
+
+# What happens when you call a method such as Computer#mouse? The call gets
+# routed to method_missing, which checks whether the wrapped data source has
+# a get_mouse_info method. If it doesn’t have one, the call falls back to
+# BasicObject#method_missing, which throws a NoMethodError. If the data source
+# knows about the component, the original call is converted into two calls to
+# DS#get_mouse_info and DS#get_mouse_price. The values returned from these calls
+# are used to build the final result.
+
+# ** This is a little bit hard to grasp..particularly with super in there as
+# well **
+
+# respond_to_missing? :
+
+# If you specifically ask a Computer whether it responds to a Ghost Method, it
+# will flat-out lie:
+
+cmp = Computer.new(0, DS.new)
+cmp.respond_to?(:mouse) # => false
+
+# This behavior can be problematic, because respond_to? is a commonly used
+# method. (If you need convincing, just note that the Computer itself is calling
+# respond_to? on the data source.) Fortunately, Ruby provides a clean mechanism
+# to make respond_to? aware of Ghost Methods.
+
+# respond_to? calls a method named respond_to_missing? that is supposed to return
+# true if a method is a Ghost Method. (In your mind, you could rename
+# respond_to_missing? to something like ghost_method?.) To prevent respond_to?
+# from lying, override respond_to_missing? every time you override method_missing:
+
+class Computer
+# ...
+  def respond_to_missing?(method, include_private = false)
+    @data_source.respond_to?("get_#{method}_info") || super
+  end
+end
+
+# The code in this respond_to_missing? is similar to the first line of
+# method_missing: it finds out whether a method is a Ghost Method. If it is, it
+# returns true. If it isn’t, it calls super. In this case, super is the default
+# Object#respond_to_missing?, which always returns false.
+# Now respond_to? will learn about your Ghost Methods from respond_to_missing?
+# and return the right result:
+
+cmp.respond_to?(:mouse) # => true
+
+# The rule is now this: remember to override respond_to_missing? every time you
+# override method_missing.
+
+# const_missing:
