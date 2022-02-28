@@ -131,3 +131,8 @@
 # What about respond_to? Will ghost methods appear? :
 # The rule is this: remember to override respond_to_missing? (not respond_to)
 # every time you override method_missing.
+
+# Working with ghost methods:
+# Start by writing regular methods; then, when you’re confident that your code is
+# working, refactor the methods to a method_missing. This way, you won’t
+# inadvertently hide a bug behind a Ghost Method.

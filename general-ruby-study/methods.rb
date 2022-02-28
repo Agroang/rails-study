@@ -461,3 +461,116 @@ cmp.respond_to?(:mouse) # => true
 # override method_missing.
 
 # const_missing:
+
+# When you reference a constant that doesn’t exist, Ruby passes the name of
+# the constant to const_missing as a symbol.
+# (Seems to be used like method_missing in that sense, there is a Rake example
+# in the book to check if needed)
+
+# Creating unwanted loops, or breaking code due to wrong calls to variables or
+# methods can be a common problem when using Ghost Methods: because unknown calls
+# become calls to method_missing, your object might accept a call that’s just plain
+# wrong. Finding a bug like this one in a large program can be pretty painful.
+
+# Example of bugged code:
+
+class Roulette
+  def method_missing(name, *args)
+    person = name.to_s.capitalize
+    3.times do
+      number = rand(10) + 1
+      puts "#{number}..."
+    end
+    "#{person} got a #{number}" # bug here, code can't read number as it is
+  end                           # inside the loop, but it won't break there as
+end                             # it will call to method_missing, and that will
+# get inside the same code again, creating an infinite loop until the call stack
+# overflows. Nasty bug.
+
+number_of = Roulette.new
+puts number_of.bob
+
+# To avoid this kind of trouble, take care not to introduce too many Ghost
+# Methods. For example, Roulette might be better off if it simply accepted the
+# names of people on Bill’s team. Also, remember to fall back on
+# BasicObject#method_missing when you get a call you don’t know how to handle.
+# Here’s a better Roulette that still uses method_missing:
+
+class Roulette
+  def method_missing(name, *args)
+    person = name.to_s.capitalize
+    super unless %w[Bob Frank Bill].include? person # falls back to regular
+    number = 0                                      # method_missing if is not
+    3.times do                                      # in array
+      number = rand(10) + 1
+      puts "#{number}..."
+    end
+    "#{person} got a #{number}" # that way a call to number wouldn't break there
+  end                           # as number is not in the array (I think that's)
+end                             # what it does....
+
+# Working with ghost methods:
+# Start by writing regular methods; then, when you’re confident that your code is
+# working, refactor the methods to a method_missing. This way, you won’t
+# inadvertently hide a bug behind a Ghost Method.
+
+# Blank Slates:
+
+# Related to other common bugs, you need to know that when the name of a Ghost
+# Method clashes with the name of a real, inherited method, the latter wins.
+
+# If you don’t need the inherited method, you can fix the problem by removing
+# it. While you’re at it, you might want to remove most methods from the class,
+# preventing such name clashes from ever happening again.
+
+# A skinny class with a minimal number of methods is called a Blank Slate. As it
+# turns out, Ruby has a ready-made Blank Slate for you to use.
+
+# You can say that Blank Slate refers to the removal of methods from an object
+# to turn them into Ghost Methods.
+
+class C
+  def method_missing(name, *args)
+    "a Ghost Method"
+  end
+end
+
+obj = C.new
+obj.to_s # => "#<C:0x007fbb2a10d2f8>"
+
+# Question: Why does it return the instance when calling to_s?
+# Answer: It is returning a STRING with the instance info, so it is using to_s
+
+class D < BasicObject
+  def method_missing(name, *args)
+    "a Ghost Method"
+  end
+end
+blank_slate = D.new
+blank_slate.to_s # => "a Ghost Method"
+
+# Question: I am not really understanding how this works, just by inheriting
+# from BasicObject will create a ghost method for to_s? I thought to_s was
+# an actual method and we haven't touched it directly....
+# Answer: By inheriting directly from BasicObject you avoid inheriting it
+# through Object, that way you avoid all of Object's instance methods that
+# include, for example, to_s
+
+# BasicObject:
+# The root of Ruby’s class hierarchy, BasicObject, has only a handful of instance
+# methods:
+
+im = BasicObject.instance_methods
+im # => [:==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__,
+# :__id__, :__binding__]
+
+# If you don’t specify a superclass, your classes inherit by default from Object,
+# which is itself a subclass of BasicObject.
+
+# If you want a Blank Slate, you can inherit directly from BasicObject instead.
+
+# Inheriting from BasicObject is the quicker way to define a Blank Slate in Ruby.
+# In some cases, however, you might want to control exactly which methods to
+# keep and which methods to remove from your class.
+
+# Removing Methods:
