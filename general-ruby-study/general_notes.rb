@@ -140,3 +140,10 @@
 # The choice between Dynamic and Ghost Methods depends on your experience and
 # coding style, but you can follow a simple rule of thumb when in doubt: use
 # Dynamic Methods if you can and Ghost Methods if you have to.
+
+# Blocks:
+
+# Blocks are very useful for controlling scope, which is very powerful in
+# metaprogramming. Blocks are just one member of a larger family of “callable
+# objects,” which include objects such as procs and lambdas. Blocks come from
+# functional programming rather than object oriented programming.
