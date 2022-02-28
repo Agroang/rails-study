@@ -214,3 +214,192 @@ end
 # why they’re “local.”)
 
 # Scope Gates:
+
+# There are exactly three places where a program leaves the previous scope
+# behind and opens a new one:
+
+# • Class definitions
+# • Module definitions
+# • Methods
+
+# Scope changes whenever the program enters (or exits) a class or module
+# definition or a method. These three borders are marked by the keywords class,
+# module, and def, respectively. Each of these keywords acts like a Scope Gate.
+
+a = 1
+defined? a # => "local-variable"
+
+module MyModule
+  b = 1
+  defined? a # => nil
+  defined? b # => "local-variable"
+end
+
+defined? a # => "local-variable"
+defined? b # => nil
+
+# Question: Similar to the last one, I thought I had access to outer variables
+# need to confirm ...
+
+# Another example but now clearly stating the scope gates:
+
+v1 = 1
+
+class MyClass # SCOPE GATE: entering class
+  v2 = 2
+  local_variables # => ["v2"]
+  def my_method # SCOPE GATE: entering def
+    v3 = 3
+    local_variables
+  end # SCOPE GATE: leaving def
+  local_variables # => ["v2"]
+end # SCOPE GATE: leaving class
+
+obj = MyClass.new
+obj.my_method # => [:v3]
+local_variables # => [:v1, :obj]
+
+# There is a subtle difference between class and module on one side and def on
+# the other. The code in a class or module definition is executed immediately.
+# Conversely, the code in a method definition is executed later, when you
+# eventually call the method. However, as you write your program, you usually
+# don’t care when it changes scope—you only care that it does.
+
+# Flattening the Scope:
+
+# The more you become proficient in Ruby, the more you get into difficult
+# situations where you want to pass bindings through a Scope Gate.
+
+my_var = "Success"
+
+class MyClass
+  # We want to print my_var here...
+  def my_method
+    # ..and here
+  end
+end
+
+# Look at the class Scope Gate first. You can’t pass my_var through it, but you
+# can replace class with something else that is not a Scope Gate: a method call.
+# If you could call a method instead of using the class keyword, you could capture
+# my_var in a closure and pass that closure to the method.
+
+# If you look at Ruby’s documentation, you’ll find the answer: Class.new is a
+# perfect replacement for class. You can also define instance methods in the
+# class if you pass a block to Class.new:
+
+my_var = "Success"
+
+MyClass = Class.new do
+  # Now we can print my_var here...
+  puts "#{my_var} in the class definition!"
+  def my_method
+    # ...but how can we print it here?
+  end
+end
+
+# Now, how can you pass my_var through the def Scope Gate? Once again, you
+# have to replace the keyword with a method call. Think of the discussion about
+# Dynamic Methods: instead of def, you can use Module#define_method:
+
+my_var = "Success"
+
+MyClass = Class.new do
+  puts "#{my_var} in the class definition"
+  define_method :my_method do
+    puts "#{my_var} in the method"
+  end
+end
+
+MyClass.new.my_method
+
+# => Success in the class definition
+# => Success in the method
+
+# If you replace Scope Gates with method calls, you allow one scope to see
+# variables from another scope. Technically, this trick should be called nested
+# lexical scopes, but many Ruby coders refer to it simply as “flattening the
+# scope,” meaning that the two scopes share variables as if the scopes were
+# squeezed together. For short, you can call this Flat Scope.
+
+# Another example with Flat Scope:
+
+# Use a closure to share variables between two scopes:
+
+class C
+  def an_attribute
+    @attr
+  end
+end
+
+obj = C.new
+a_variable = 100
+
+# flat scope:
+
+obj.instance_eval do
+  @attr = a_variable
+end
+
+obj.an_attribute # => 100
+
+# Question: How do you use #instance_eval? Need more information about this.
+
+# Sharing the scope:
+
+# Once you know about Flat Scopes, you can do pretty much whatever you
+# want with scopes. For example, maybe you want to share a variable among
+# a few methods, and you don’t want anybody else to see that variable. You can
+# do that by defining all the methods in the same Flat Scope as the variable:
+
+def define_methods
+  shared = 0
+  Kernel.send :define_method, :counter do
+    shared
+  end
+
+  Kernel.send :define_method, :inc do |x|
+    shared += x
+  end
+end
+
+define_methods
+counter # => 0
+inc(4)
+counter # => 4
+
+# ** Quite interesting way ...not sure if I completely understand it's usability
+# but quite impressive nevertheless **
+
+# This example defines two Kernel Methods. (It also uses Dynamic Dispatch to
+# access the private class method define_method on Kernel.) Both Kernel#counter
+# and Kernel#inc can see the shared variable. No other method can see shared,
+# because it’s protected by a Scope Gate —that’s what the define_methods
+# method is for. This smart way to control the sharing of variables is called a
+# Shared Scope.
+
+# Shared Scopes are not used much in practice, but they’re a powerful trick
+# and a good example of the power of scopes. With a combination of Scope
+# Gates, Flat Scopes, and Shared Scopes, you can twist and bend your scopes
+# to see exactly the variables you need, from the place you want.
+
+# Another example using Shared Scope:
+
+lambda {
+  shared = 10
+  self.class.class_eval do
+    define_method :counter do
+      shared
+    end
+
+    define_method :down do
+      shared -= 1
+    end
+  end
+}.call
+
+counter # => 10
+3.times { down }
+counter # => 7
+
+# Closures Wrap-Up:
