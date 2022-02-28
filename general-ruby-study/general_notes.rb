@@ -136,3 +136,7 @@
 # Start by writing regular methods; then, when you’re confident that your code is
 # working, refactor the methods to a method_missing. This way, you won’t
 # inadvertently hide a bug behind a Ghost Method.
+
+# The choice between Dynamic and Ghost Methods depends on your experience and
+# coding style, but you can follow a simple rule of thumb when in doubt: use
+# Dynamic Methods if you can and Ghost Methods if you have to.

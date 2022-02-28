@@ -574,3 +574,30 @@ im # => [:==, :equal?, :!, :!=, :instance_eval, :instance_exec, :__send__,
 # keep and which methods to remove from your class.
 
 # Removing Methods:
+
+# You can remove a method from a class by using either Module#undef_method or
+# Module#remove_method. The drastic undef_method removes any method, including
+# the inherited ones. The kinder remove_method removes the method from the
+# receiver, but it leaves inherited methods alone.
+
+# Pros & Cons of both: Dynamic Methods & Ghost Methods:
+
+# As you experienced yourself, Ghost Methods can be dangerous. You can avoid most
+# of their problems by following a few basic recommendations (always call super,
+# always redefine respond_to_missing?)—but even then, Ghost Methods can sometimes
+# cause puzzling bugs.
+
+# The problems with Ghost Methods boil down to the fact that they are not
+# really methods; instead, they’re just a way to intercept method calls. Because
+# of this, they behave differently from actual methods. For example, they don’t
+# appear in the list of names returned by Object#methods. In contrast, Dynamic
+# Methods are just regular methods that happened to be defined with define_method
+# instead of def, and they behave the same as any other method.
+
+# There are times when Ghost Methods are your only viable option. This usually
+# happens when you have a large number of method calls, or when you don’t
+# know what method calls you might need at runtime.
+
+# All things considered, the choice between Dynamic and Ghost Methods depends on
+# your experience and coding style, but you can follow a simple rule of thumb
+# when in doubt: use Dynamic Methods if you can and Ghost Methods if you have to.
