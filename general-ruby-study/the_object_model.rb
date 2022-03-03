@@ -314,6 +314,13 @@ class MyClass
 end
 
 class MySubclass < MyClass
+  # def my_method
+  ## you can do something else here as well, it could do that plus use the
+  ## my_method from the parent class
+  ## you could customize evne the initialize method to get, for example, more
+  ## variables.
+  #   super
+  # end
 end
 
 obj = MySubclass.new
@@ -486,6 +493,7 @@ self.class # => Object
 # methods that you called have returned.
 
 # Question: Is "main" the similar to "global()" in JavaScript?
+# main is an object of class Object.
 
 # About private methods (extra piece of information):
 

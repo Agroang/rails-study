@@ -164,6 +164,7 @@ local_variables # => [:v1, :obj]
 
 # Question: I thought I was able to see the values of outer variables from inner
 # but not viceversa...need to check in details what does the above means.
+# local variables
 
 # Global Variables and Top-Level Instance Variables:
 
@@ -344,6 +345,8 @@ end
 obj.an_attribute # => 100
 
 # Question: How do you use #instance_eval? Need more information about this.
+# takes a block and instead of executing in the current context it does it in
+# another context. There is also class_eval
 
 # Sharing the scope:
 
