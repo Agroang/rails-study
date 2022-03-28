@@ -117,7 +117,6 @@ end
 # The idea behind the lambda method is that you pass it a code block and the
 # method will pass the corresponding Proc object right back at you.
 
-
 # Although calling Proc.new is nearly synonymous with lambda:
 
 from_proc_new = Proc.new { puts "hello from a block" }
