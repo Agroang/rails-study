@@ -156,3 +156,6 @@ end
 # keyword or closed with an end, whenever an exception get raised, and
 # whenever—and here’s the kicker—a line of code gets executed.
 # Nevertheless, it is too powerful so if you use it you will get a lot of data!
+
+# Things to be careful with hooks: For example, the #inherited hook will be
+# triggered for all the subclasses, so you need to be careful how you use it!
