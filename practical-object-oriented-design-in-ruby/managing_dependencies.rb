@@ -188,3 +188,128 @@ puts GearWrapper.gear(
 # From the point of view of classes: Depend on things that change less often
 # than you do. Worst case scenario is having a class that has many dependents
 # and that is very likely to change.
+
+# The distinction between a message that asks for what the sender wants and a
+# message that tells the receiver how to behave may seem subtle, but the
+# consequences are significant.
+
+# Knowning too much exposes a lot of the methods of a class, so we want to
+# expose less so the classes do not depend on those methods, allowing changes
+# if needed without having to change multiple classes to achieve that.
+
+# The things that a class knows about other objects make up its context.
+# The context that an object expects has a direct effect on how difficult it is
+# to reuse. Objects that have a simple context are easy to use and easy to test;
+# they expect few things from their surroundings. Objects that have a complicated
+# context are hard to use and hard to test; they require complicated setup before
+# they can do anything. The best possible situation is for an object to be
+# completely independent of its context. An object that could collaborate with
+# others without knowing who they are or what they do could be reused in novel
+# and unanticipated ways.
+
+# Blind trust is a keystone of object-oriented design. It allows objects to
+# collaborate without binding themselves to context and is necessary in any
+# application that expects to grow and change.
+
+# "What" over "how" (the object knows "what" it wants but doesn't need to know
+# "how" the other object does it)
+
+# Switching your attention from objects to messages allows you to concentrate on
+# designing an application built upon public interfaces.
+
+# Think about interfaces. Create them intentionally. It is your interfaces, more
+# than all of your tests and any of your code, that define your application and
+# determine its future.
+
+# Every time you create a class, declare its interfaces. Methods in the public
+# interface should:
+
+# • Be explicitly identified as such.
+# • Be more about what than how.
+# • Have names that, insofar as you can anticipate, will not change.
+# • Prefer keyword arguments.
+
+# Be just as intentional about the private interface; make it inescapably
+# obvious. Tests, because they serve as documentation, can support this endeavor.
+# Either do not test private methods or, if you must, segregate those tests from
+# the tests of public methods.
+
+# Ruby provides three relevant keywords: public, protected, and private. Use
+# of these keywords serves two distinct purposes. First, they indicate which
+# methods are stable and which are unstable. Second, they control how visible a
+# method is to other parts of your application. These two purposes are very
+# different. Conveying information that a method is stable or unstable is one
+# thing; attempting to control how others use it is quite another.
+
+# The private keyword denotes the least stable kind of method and provides the
+# most restricted visibility.
+
+# The protected keyword also indicates an unstable method, but one with slightly
+# different visibility restrictions. Protected methods allow explicit receivers
+# as long as the receiver is self or an instance of the same class or subclass
+# of self.
+
+# The public keyword indicates that a method is stable; public methods are
+# visible everywhere.
+
+# Users of a class can redefine any method to public regardless of its initial
+# declaration. The private and protected keywords are more like flexible
+# barriers than concrete restrictions. Anyone can get by them; it’s simply a
+# matter of expending the effort.
+
+# A dependency on a private method of an external framework is a form of
+# technical debt. Avoid these dependencies.
+
+# Create public methods that allow senders to get what they want without knowing
+# how your class implements its behavior.
+
+# The Law of Demeter is a set of coding rules that results in loosely coupled
+# objects. Loose coupling is nearly always a virtue but is just one component of
+# design and must be balanced against competing needs.
+
+# Demeter restricts the set of objects to which a method may send messages; it
+# prohibits routing a message to a third object via a second object of a
+# different type. Demeter is often paraphrased as “only talk to your immediate
+# neighbors” or “use only one dot.”
+# * This one seems a little bit hard to impose...we usually route! *
+
+# Demeter became a “law” because a human being decided so; don’t be fooled by
+# its grandiose name. As a law, it’s more like “floss your teeth every day” than
+# it is like gravity.
+
+# Certain “violations” of Demeter reduce your application’s flexibility and
+# maintainability, while others make perfect sense.
+
+# One common way to remove train wrecks (object.object.object.etc...) from code
+# is to use delegation to avoid the dots. In object-oriented terms, to delegate
+# a message is to pass it on to another object, often via a wrapper method. The
+# wrapper method encapsulates, or hides, knowledge that would otherwise be
+# embodied in the message chain.
+
+# There are a number of ways to accomplish delegation. Ruby provides support via
+# delegate.rb and forwardable.rb, which make it easy for an object to
+# automatically intercept a message sent to self and to instead send it
+# somewhere else.
+
+# Delegation is tempting as a solution to the Demeter problem because it removes
+# the visible evidence of violations. This technique is sometimes useful, but
+# beware: It can result in code that obeys the letter of the law while ignoring
+# its spirit. Using delegation to hide tight coupling is not the same as
+# decoupling the code.
+
+# Message chains like customer.bicycle.wheel.rotate occur when your
+# design thoughts are unduly influenced by objects you already know. Your
+# familiarity with the public interfaces of known objects may lead you to string
+# together long message chains to get at distant behavior (because you know the
+# behavior and you know how to get it)
+
+# A change in the chain can break everything and even worse, it binds the object
+# to a very specific implementation thus in cannot be used in any other context.
+
+# The train wrecks of Demeter violations are clues that there are objects whose
+# public interfaces are lacking.
+
+# Focusing on messages reveals objects that might otherwise be overlooked.
+# When messages are trusting and ask for what the sender wants instead of
+# telling the receiver how to behave, objects naturally evolve public interfaces
+# that are flexible and reusable in novel and unexpected ways.
