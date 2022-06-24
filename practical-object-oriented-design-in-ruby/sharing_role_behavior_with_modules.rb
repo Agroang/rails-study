@@ -116,3 +116,18 @@
 # If you cannot correctly identify the abstraction, there may not be one, and
 # if no common abstraction exists, then inheritance is not the solution to your
 # design problem.
+
+# In order for a type system to be sane, subtypes must be substitutable for
+# their supertypes.Following this principle creates applications where a
+# subclass can be used anywhere its superclass would do and where objects that
+# include modules can be trusted to interchangeably play the module’s role.
+
+# The fundamental coding technique for creating inheritable code is the template
+# method pattern. This pattern is what allows you to separate the abstract from
+# the concrete. The abstract code defines the algorithms and the concrete
+# inheritors of that abstraction contribute specializations by overriding these
+# template methods.The template methods represent the parts of the algorithm
+# that vary, and creating them forces you to make explicit decisions about what
+# varies and what does not.
+
+# 7.2.5
