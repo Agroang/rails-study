@@ -130,4 +130,29 @@
 # that vary, and creating them forces you to make explicit decisions about what
 # varies and what does not.
 
-# 7.2.5
+# Avoid writing code that requires its inheritors to send super; instead use
+# hook messages to allow subclasses to participate while absolving them of
+# responsibility for knowing the abstract algorithm. Inheritance, by its very
+# nature, adds powerful dependencies on the structure and arrangement of code.
+# Writing code that requires subclasses to send super adds an additional
+# dependency; avoid this if you can. Hook methods solve the problem of sending
+# super, but, unfortunately, only for adjacent levels of the hierarchy. If you
+# have to add another subclass to a subclass you might have to end up using
+# super to reach the super class method.
+
+# The limitations of hook methods are just one of the many reasons to create
+# shallow hierarchies.
+# Every hierarchy can be thought of a pyramid that has both depth and breadth.
+# An object’s depth is the number of superclasses between it and the top. Its
+# breadth is the number of its direct subclasses. A hierarchy’s shape is defined
+# by its overall breadth and depth, and it is this shape that determines ease of
+# use, maintenance, and extension.
+
+# Shallow, narrow hierarchies are easy to understand. Shallow, wide hierarchies
+# are slightly more complicated. Deep, narrow hierarchies are a bit more
+# challenging and unfortunately have a natural tendency to get wider, strictly
+# as a side effect of their depth. Deep, wide hierarchies are difficult to
+# understand, costly to maintain, and should be avoided.
+
+# Because objects depend on everything above them, a deep hierarchy has a large
+# set of built-in dependencies, each of which might someday change.
